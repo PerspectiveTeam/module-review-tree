@@ -1,0 +1,24 @@
+<script>
+    function initInfiniteScroll(productId) {
+        return {
+            productId,
+            page: 1,
+            canNext: true,
+            fetchNext() {
+                fetch(
+                    `${BASE_URL}perspective_reviewtree/fetch?id=${this.productId}&p=${++this.page}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                    }
+                ).then(result => result.json())
+                .then(data => {
+                    this.$refs.items.insertAdjacentHTML('beforeend', data.html);
+                    this.canNext = data.can_next ?? false;
+                });
+            },
+        }
+    }
+</script>

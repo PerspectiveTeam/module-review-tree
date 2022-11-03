@@ -1,0 +1,38 @@
+{
+    "name": "perspective/module-review-tree",
+    "version": "0.1.0",
+    "description": "Review Tree module",
+    "type": "magento2-module",
+    "require": {
+        "magento/framework": ">=102",
+        "magento/module-review": "*",
+        "magento/module-review-graph-ql": "*"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "phpunit/phpunit": "^9.5"
+    },
+    "license": [
+        "Proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "src/ReviewTree/registration.php"
+        ],
+        "psr-4": {
+            "Perspective\\ReviewTree\\": "src/ReviewTree/"
+        }
+    },
+    "repositories": {
+        "0": {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "magento/composer-dependency-version-audit-plugin": true,
+            "magento/magento-composer-installer": false
+        }
+    }
+}

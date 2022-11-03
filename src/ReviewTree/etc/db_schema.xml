@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="review">
+        <column xsi:type="bigint" name="parent_id" unsigned="true" nullable="true" comment="Parent Review Id"/>
+        <constraint xsi:type="foreign" referenceId="REVIEW_PARENT_ID_REVIEW_ID"
+                    referenceTable="review" referenceColumn="review_id"
+                    table="review" column="parent_id" onDelete="CASCADE"/>
+
+        <column xsi:type="int" name="level" unsigned="true" nullable="false" default="0" />
+        <column xsi:type="text" name="timestamped_path" nullable="false" />
+
+        <column xsi:type="tinyint" name="is_author_verified" unsigned="true" nullable="false" default="0"
+                comment="Is Author Verified"/>
+    </table>
+</schema>

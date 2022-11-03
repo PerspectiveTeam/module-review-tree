@@ -1,0 +1,11 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="review_save_before">
+        <observer name="perspective_reviewtree_extension_fields_handler"
+                  instance="Perspective\ReviewTree\Observer\ReviewSaveBefore"/>
+    </event>
+    <event name="review_save_after">
+        <observer name="perspective_reviewtree_extension_fields_handler"
+                  instance="Perspective\ReviewTree\Observer\ReviewSaveAfter"/>
+    </event>
+</config>

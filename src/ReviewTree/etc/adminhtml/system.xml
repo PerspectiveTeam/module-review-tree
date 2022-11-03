@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="perspective_reviewtree" sortOrder="100" showInWebsite="1" showInStore="1" showInDefault="1"
+                 translate="label">
+            <label>Review Tree</label>
+            <tab>perspective</tab>
+            <resource>Perspective_ReviewTree::settings</resource>
+            <group id="general" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+                <label>General</label>
+                <field id="enable" type="select" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1"
+                       translate="label">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="infinite_scroll" sortOrder="20" showInWebsite="1" showInStore="1" showInDefault="1"
+                   translate="label">
+                <label>Infinite Scroll</label>
+                <depends>
+                    <field id="perspective_reviewtree/general/enable">1</field>
+                </depends>
+                <field id="enable" type="select" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1"
+                       translate="label">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="initial_render_size" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+                       showInStore="1" translate="label">
+                    <label>Initial Render Size</label>
+                    <validate>required-entry validate-digits</validate>
+                    <depends>
+                        <field id="perspective_reviewtree/infinite_scroll/enable">1</field>
+                    </depends>
+                </field>
+                <field id="items_per_fetch" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                       showInStore="1" translate="label">
+                    <label>Items Per Fetch</label>
+                    <validate>required-entry validate-digits</validate>
+                    <depends>
+                        <field id="perspective_reviewtree/infinite_scroll/enable">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="autogenerate" sortOrder="30" showInWebsite="1" showInStore="1" showInDefault="1"
+                   translate="label">
+                <label>Autogenerate Fields</label>
+                <field id="nickname" type="select" sortOrder="10" showInWebsite="1" showInStore="1"
+                       showInDefault="1" translate="label">
+                    <label>Nickname Strategy</label>
+                    <source_model>Perspective\ReviewTree\Model\Backend\OptionalFieldStrategyOptions</source_model>
+                </field>
+                <field id="title" type="select" sortOrder="20" showInWebsite="1" showInStore="1"
+                       showInDefault="1" translate="label">
+                    <label>Title Strategy</label>
+                    <source_model>Perspective\ReviewTree\Model\Backend\OptionalFieldStrategyOptions</source_model>
+                </field>
+            </group>
+            <group id="upgrade_stores" sortOrder="40" showInWebsite="1" showInStore="1" showInDefault="1"
+                   translate="label">
+                <label>Upgrade Stores Visibility</label>
+                <field id="mode" type="select" sortOrder="10" showInWebsite="1" showInStore="1"
+                       showInDefault="1" translate="label">
+                    <label>Mode</label>
+                    <source_model>Perspective\ReviewTree\Model\Backend\UpgradeStoresVisibilityModes</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

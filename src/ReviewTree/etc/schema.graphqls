@@ -1,0 +1,12 @@
+input CreateProductReviewInput {
+    parent_id: Int
+    nickname: String
+    summary: String
+}
+
+type ProductReview {
+    parent_id: Int
+    level: Int!
+    path: String!
+}
+

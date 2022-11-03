@@ -1,0 +1,59 @@
+<?php
+
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Review\Block\Product\View as ProductReview;
+use Magento\Theme\Block\Html\Pager;
+use Perspective\ReviewTree\ViewModel\ProductReviews;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var ProductReview $block */
+/** @var Escaper $escaper */
+/** @var Pager $toolbar */
+/** @var ViewModelRegistry $viewModels */
+
+$reviewCollection = $block->getReviewsCollection();
+
+// Note: Setting the collection on the toolbar block applies pagination, so it has to happen before collection loading.
+if ($toolbar = $block->getChildBlock('review_list.toolbar')) {
+    $toolbar->setCollection($reviewCollection);
+}
+$reviewCollection->load()->addRateVotes();
+
+$items = $reviewCollection->getItems();
+
+$treeVm = $viewModels->require(ProductReviews::class);
+$items = $treeVm->computePlainChildrenMap($items);
+?>
+<?php if (count($items)): ?>
+    <div class="mx-auto py-6 items-center" id="customer-review-list">
+        <div class="container mx-auto flex pt-6 pb-3 mb-6 md:flex-row border-b-2 border-gray-300">
+            <?php if (!$block->getHideTitle()): ?>
+                <h3 class="text-gray-900 text-2xl title-font font-base text-center md:text-left w-full">
+                    <?= $escaper->escapeHtml(__('Customer Reviews')) ?>
+                </h3>
+            <?php endif ?>
+        </div>
+        <div class="card w-full px-6 py-3">
+            <?php foreach ($items[0] as $review) {
+                $itemBlock = $block->getChildBlock('item')
+                                   ->setData('items', $items)
+                                   ->setData('review', $review);
+                echo $itemBlock->toHtml();
+            } ?>
+        </div>
+        <?php if ($toolbar): ?>
+        <div class="toolbar review-toolbar mt-4">
+            <?= $toolbar->toHtml() ?>
+        </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

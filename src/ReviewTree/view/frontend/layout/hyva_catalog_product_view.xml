@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="content">
+            <block name="review_list.js"
+                   template="Perspective_ReviewTree::hyva/product/scripts/list.phtml"
+                   ifconfig="perspective_reviewtree/general/enable"/>
+            <block name="product.review.form_js"
+                   template="Perspective_ReviewTree::hyva/product/scripts/form.phtml"
+                   ifconfig="perspective_reviewtree/general/enable"/>
+        </referenceBlock>
+
+        <referenceBlock name="review_list" class="Perspective\ReviewTree\Block\ListReview">
+            <action method="setTemplate" ifconfig="perspective_reviewtree/general/enable">
+                <argument name="template" xsi:type="string">Perspective_ReviewTree::hyva/product/view/list.phtml</argument>
+            </action>
+            <block name="review_list.item" as="item" ifconfig="perspective_reviewtree/general/enable"
+                   class="Magento\Framework\View\Element\Template"
+                   template="Perspective_ReviewTree::hyva/product/view/item.phtml">
+                <block name="review_list.item.form" as="form"
+                       class="Magento\Review\Block\Form"
+                       template="Perspective_ReviewTree::hyva/product/form.phtml"/>
+            </block>
+        </referenceBlock>
+
+        <referenceBlock name="product.review.form">
+            <action method="setTemplate" ifconfig="perspective_reviewtree/general/enable">
+                <argument name="template" xsi:type="string">Perspective_ReviewTree::hyva/product/form.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

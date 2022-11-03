@@ -1,0 +1,162 @@
+<?php
+
+use Hyva\GraphqlViewModel\ViewModel\GraphqlViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\Store;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\ReCaptcha;
+
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Store $viewModelStore */
+$viewModelStore = $viewModels->require(Store::class);
+
+/** @var GraphqlViewModel $gqlViewModel */
+$gqlViewModel = $viewModels->require(GraphqlViewModel::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on Magento_ReCaptchaReview module
+/** @var ReCaptcha $recaptcha */
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+
+<script>
+    function initRatingSection(ratingId, options) {
+        return {
+            ratingId,
+            options: JSON.parse(options),
+            selectedOptionId: null,
+            rating: 0,
+            hoverRating: 0,
+            get value() {
+                return {id: ratingId, value_id: this.selectedOptionId}
+            },
+            rate(optionId, dispatchFn) {
+                this.selectedOptionId = optionId;
+                this.rating = this.options.find(option => option.id === optionId).amount;
+                dispatchFn('rating-selected', {k: ratingId, v: this.value});
+            },
+            hovered(optionId) {
+                this.hoverRating = this.options.find(option => option.id === optionId).amount;
+            },
+            unhovered() {
+                this.hoverRating = this.rating;
+            }
+        }
+    }
+
+    function initReviewForm(sku, parentId = null) {
+        return {
+            isLoading: false,
+            displaySuccessMessage: false,
+            displayErrorMessage: false,
+            errorMessages: [],
+            errors: 0,
+            hasCaptchaToken: 0,
+            sku,
+            parentId,
+            nickname: null,
+            summary: null,
+            ratings: {},
+            review: null,
+            setErrorMessages: function (messages) {
+                this.errorMessages = [messages]
+                this.displayErrorMessage = this.errorMessages.length
+                this.hasCaptchaToken = 0
+            },
+            submitForm: function () {
+                if (!this.validate()) {
+                    this.setErrorMessages([
+                        '<?= $escaper->escapeJs(__('Please verify you\'ve entered all required information')) ?>'
+                    ]);
+                    return;
+                }
+
+                // Do not remove $form. The variable is used in the recaptcha child template.
+                const $form = this.$root ?? this.$el;
+                <?= $recaptcha ? $recaptcha->getValidationJsHtml(ReCaptcha::RECAPTCHA_FORM_ID_PRODUCT_REVIEW) : '' ?>
+
+                if (this.errors === 0) {
+                    this.placeReview();
+                }
+            },
+            validate: function () {
+                if (this.review && this.ratings) {
+                    return true;
+                }
+
+                return false;
+            },
+            placeReview: function () {
+                this.isLoading = true;
+                this.displayErrorMessage = false;
+
+                const query = `<?= /* @noEscape */ $gqlViewModel->query('create_product_review_mutation', '
+mutation createProductReviewMutation(
+    $sku: String!,
+    $parent_id: Int,
+    $nickname: String,
+    $summary: String,
+    $review: String!,
+    $ratings: [ProductReviewRatingInput]!
+) {
+    createProductReview(
+        input: {
+            sku: $sku,
+            parent_id: $parent_id,
+            nickname: $nickname,
+            summary: $summary,
+            text: $review,
+            ratings: $ratings
+        }
+    ) {
+        review {
+            nickname
+        }
+    }
+}') ?>`;
+
+                const variables = {
+                    sku: this.sku,
+                    parent_id: this.parentId,
+                    nickname: this.nickname,
+                    summary: this.summary,
+                    review: this.review,
+                    ratings: Object.values(this.ratings).filter(x => x.id && x.value_id),
+                };
+
+                const fieldName = '<?= $recaptcha
+                    ? $escaper->escapeJs($recaptcha->getResultTokenFieldName('review_form'))
+                    : '' ?>';
+                const recaptchaHeader = fieldName && this.$root && this.$root.elements[fieldName]
+                    ? {'X-ReCaptcha': this.$root.elements[fieldName].value}
+                    : {};
+
+                fetch(`${BASE_URL}graphql`, {
+                    method: 'POST',
+                    headers: Object.assign({
+                        'Content-Type': 'application/json;charset=utf-8',
+                        'Store': '<?= $escaper->escapeJs($viewModelStore->getStoreCode()) ?>'
+                    }, recaptchaHeader),
+                    credentials: 'include',
+                    body: JSON.stringify({query: query, variables: variables})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                            this.isLoading = false;
+                            if (data.errors) {
+                                this.setErrorMessages(['<?= $escaper->escapeJs(__('Submitting your review failed, please try again.')) ?>']);
+                                this.displayErrorMessage = true;
+                            } else {
+                                this.displaySuccessMessage = true;
+                            }
+                        }
+                    );
+            }
+        }
+    }
+</script>
