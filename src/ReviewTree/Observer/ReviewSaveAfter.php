@@ -6,6 +6,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Review\Model\Review;
 use Perspective\ReviewTree\Api\Data\ReviewFieldsEx;
+use Perspective\ReviewTree\Model\ConfigManager;
 
 class ReviewSaveAfter implements ObserverInterface
 {
@@ -13,6 +14,7 @@ class ReviewSaveAfter implements ObserverInterface
     private ?int $productReviewEntityId = null;
 
     public function __construct(
+        private readonly ConfigManager $configManager,
         private readonly \Magento\Review\Model\ResourceModel\Review $reviewResource
     ) {
     }
@@ -28,6 +30,10 @@ class ReviewSaveAfter implements ObserverInterface
 
     public function execute(Observer $observer): void
     {
+        if (!$this->configManager->isEnabled()) {
+            return;
+        }
+
         /** @var Review $review */
         $review = $observer->getEvent()->getDataObject();
         if (!($review instanceof Review)) {
@@ -51,6 +57,10 @@ class ReviewSaveAfter implements ObserverInterface
         } else {
             $level = 0;
             $path = $createdTimestamp;
+        }
+
+        if ($level > $this->configManager->getDepthLimit()) {
+            throw new \Exception('Review depth limit exceeded');
         }
 
         $review->setData(ReviewFieldsEx::LEVEL, $level);

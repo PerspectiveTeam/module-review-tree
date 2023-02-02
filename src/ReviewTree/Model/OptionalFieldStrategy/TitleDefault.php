@@ -8,7 +8,7 @@ use Perspective\ReviewTree\Api\AutogenerateFieldStrategyInterface;
 class TitleDefault implements AutogenerateFieldStrategyInterface
 {
 
-    public function compute(array $reviewData, CustomerInterface $customer): string
+    public function compute(array $reviewData, ?CustomerInterface $customer): string
     {
         return $reviewData['nickname'] ?? __('Review has no title');
     }

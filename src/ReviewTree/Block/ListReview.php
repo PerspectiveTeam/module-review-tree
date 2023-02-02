@@ -40,6 +40,11 @@ class ListReview extends View
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig, $localeFormat, $customerSession, $productRepository, $priceCurrency, $collectionFactory, $data);
     }
 
+    public function getDepthLimit(): int
+    {
+        return $this->configManager->getDepthLimit() ?? 1;
+    }
+
     public function isInfiniteScrollEnabled(): bool
     {
         return $this->configManager->isInfiniteScrollEnabled();

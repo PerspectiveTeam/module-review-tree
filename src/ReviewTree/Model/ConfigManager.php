@@ -33,6 +33,11 @@ class ConfigManager
         return (bool)$this->getConfig(self::GROUP_GENERAL, 'enable');
     }
 
+    public function getDepthLimit(): ?int
+    {
+        return (int)$this->getConfig(self::GROUP_GENERAL, 'depth_limit');
+    }
+
     public function isInfiniteScrollEnabled(): bool
     {
         return (bool)$this->getConfig(self::GROUP_INFINITE_SCROLL, 'enable');

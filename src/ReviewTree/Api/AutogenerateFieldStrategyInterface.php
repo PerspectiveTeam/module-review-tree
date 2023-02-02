@@ -8,5 +8,5 @@ use Magento\Review\Model\Review;
 interface AutogenerateFieldStrategyInterface
 {
 
-    public function compute(array $reviewData, CustomerInterface $customer): mixed;
+    public function compute(array $reviewData, ?CustomerInterface $customer): mixed;
 }

@@ -8,7 +8,11 @@
                     table="review" column="parent_id" onDelete="CASCADE"/>
 
         <column xsi:type="int" name="level" unsigned="true" nullable="false" default="0" />
+
         <column xsi:type="text" name="timestamped_path" nullable="false" />
+        <index referenceId="REVIEW_TIMESTAMPED_PATH" indexType="btree">
+            <column name="timestamped_path"/>
+        </index>
 
         <column xsi:type="tinyint" name="is_author_verified" unsigned="true" nullable="false" default="0"
                 comment="Is Author Verified"/>
